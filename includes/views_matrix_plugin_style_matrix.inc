@@ -27,7 +27,7 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
 
     $form['xconfig'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Row header'),
+      '#title' => t('Column header'),
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
       '#tree' => TRUE,
@@ -36,7 +36,7 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
     $form['xconfig']['field'] = array(
       '#type' => 'select',
       '#title' => t('Field'),
-      '#description' => t('Select the field to display in the row header.'),
+      '#description' => t('Select the field to display in the column header.'),
       '#options' => $field_options,
       '#default_value' => $this->options['xconfig']['field'],
     );
@@ -51,7 +51,7 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
 
     $form['yconfig'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Column header'),
+      '#title' => t('Row header'),
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
       '#tree' => TRUE,
@@ -60,7 +60,7 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
     $form['yconfig']['field'] = array(
       '#type' => 'select',
       '#title' => t('Field'),
-      '#description' => t('Select the field to display in the column header.'),
+      '#description' => t('Select the field to display in the row header.'),
       '#options' => $field_options,
       '#default_value' => $this->options['yconfig']['field'],
     );
