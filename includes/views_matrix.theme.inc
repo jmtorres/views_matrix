@@ -26,8 +26,8 @@ function template_preprocess_views_view_matrix(&$vars) {
   $handler = $view->style_plugin;
   $fields = &$view->field;
   
-  $xfield = &$fields[$options['xconfig']['xfield']];
-  $yfield = &$fields[$options['yconfig']['yfield']];
+  $xfield = &$fields[$options['xconfig']['field']];
+  $yfield = &$fields[$options['yconfig']['field']];
 
   $columns = array();
   $rows = array();
@@ -42,7 +42,9 @@ function template_preprocess_views_view_matrix(&$vars) {
     if (!in_array($item->{$yfield->field_alias}, $rows)) {
       $row_header[] = array(
         'data' => $item->{$yfield->field_alias},
-        'attributes' => array(),
+        'attributes' => array(
+          'class' => array('views-matrix-row-header'),
+        ),
       );
       $rows[] = $item->{$yfield->field_alias};
     }
@@ -57,14 +59,14 @@ function template_preprocess_views_view_matrix(&$vars) {
   }
 
   // Sorting @todo
-  if ($options['xconfig']['xsort'] == 'asc') {
+  if ($options['xconfig']['sort'] == 'asc') {
     sort($columns);
   }
   else {
     rsort($columns);
   }
 
-  if ($options['yconfig']['ysort'] == 'asc') {
+  if ($options['yconfig']['sort'] == 'asc') {
     sort($row_header);
     sort($rows);
   }
@@ -131,15 +133,18 @@ function template_preprocess_views_view_matrix(&$vars) {
       $rendered_item .= $field_output;
     }
 
-
     if (is_array($vars['rows'][$ykey][$xkey+1])) {
       $vars['rows'][$ykey][$xkey+1]['data'] .= $rendered_item;
     }
     else {
       $vars['rows'][$ykey][$xkey+1] = array(
         'data' => $rendered_item,
-        'attributes' => array(),
+        'attributes' => array(
+          'class' => array(),
+        ),
       );
+      
+      $vars['rows'][$ykey][$xkey+1]['attributes']['class'][] = ($xkey+1 % 2 == 0) ? 'even' : 'odd';
     }
   }
 }

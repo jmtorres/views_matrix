@@ -26,7 +26,7 @@
     <?php foreach ($rows as $row_index => $row): ?>
     <tr class="<?php print implode(' ', $row_classes[$row_index]); ?>">
       <?php foreach ($row as $col_index => $content): ?>
-        <t<?php print ($col_index) ? 'd' : 'h class="views-matrix-row-header"'; ?>>
+        <t<?php print ($col_index) ? 'd' : 'h'; ?><?php  print drupal_attributes($content['attributes']); ?>>
           <?php print !empty($content) ? $content['data'] : ''; ?>
         </t<?php print ($col_index) ? 'd' : 'h'; ?>>
       <?php endforeach; ?>

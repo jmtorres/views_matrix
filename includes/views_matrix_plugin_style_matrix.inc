@@ -27,50 +27,50 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
 
     $form['xconfig'] = array(
       '#type' => 'fieldset',
-      '#title' => t('X Field'),
+      '#title' => t('Row header'),
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
       '#tree' => TRUE,
     );
 
-    $form['xconfig']['xfield'] = array(
+    $form['xconfig']['field'] = array(
       '#type' => 'select',
-      '#title' => t('X Field'),
-      '#description' => t('Select the field that will group results by X'),
+      '#title' => t('Field'),
+      '#description' => t('Select the field to display in the row header.'),
       '#options' => $field_options,
-      '#default_value' => $this->options['xconfig']['xfield'],
+      '#default_value' => $this->options['xconfig']['field'],
     );
 
-    $form['xconfig']['xsort'] = array(
+    $form['xconfig']['sort'] = array(
       '#type' => 'select',
-      '#title' => t('Sort by'),
+      '#title' => t('Sort'),
       '#description' => t('Select the method to sort the field by.'),
       '#options' => array('asc' => t('Ascending'), 'dsc' => t('Descending')),
-      '#default_value' => $this->options['xconfig']['xsort'],
+      '#default_value' => $this->options['xconfig']['sort'],
     );
 
     $form['yconfig'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Y Field'),
+      '#title' => t('Column header'),
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
       '#tree' => TRUE,
     );
 
-    $form['yconfig']['yfield'] = array(
+    $form['yconfig']['field'] = array(
       '#type' => 'select',
-      '#title' => t('Y Field'),
-      '#description' => t('Select the field that will group results by Y'),
+      '#title' => t('Field'),
+      '#description' => t('Select the field to display in the column header.'),
       '#options' => $field_options,
-      '#default_value' => $this->options['yconfig']['yfield'],
+      '#default_value' => $this->options['yconfig']['field'],
     );
 
-    $form['yconfig']['ysort'] = array(
+    $form['yconfig']['sort'] = array(
       '#type' => 'select',
-      '#title' => t('Sort by'),
+      '#title' => t('Sort'),
       '#description' => t('Select the method to sort the field by.'),
       '#options' => array('asc' => t('Ascending'), 'dsc' => t('Descending')),
-      '#default_value' => $this->options['yconfig']['ysort'],
+      '#default_value' => $this->options['yconfig']['sort'],
     );
   }
 
@@ -80,7 +80,12 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
   function validate() {
     $errors = parent::validate();
 
-    if (empty($this->options['xconfig']['xfield']) || empty($this->options['yconfig']['yfield'])) {
+    if (!$options->uses_fields) {
+      // Cannot support entity render.
+      $errors[] = t('Style @style requires a field row plugin.', array('@style' => $this->definition['title']));
+    }
+
+    if (empty($this->options['xconfig']['field']) || empty($this->options['yconfig']['field'])) {
       // Do not save without x field or y field.
       $errors[] = t('Style @style requires an x and y field to be defined.', array('@style' => $this->definition['title']));
     }
@@ -88,7 +93,7 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
       // Check if fields exist still.
       $options = $this->display->handler->get_field_labels(TRUE);
 
-      if (!isset($options[$this->options['xconfig']['xfield']]) || !isset($options[$this->options['yconfig']['yfield']])) {
+      if (!isset($options[$this->options['xconfig']['field']]) || !isset($options[$this->options['yconfig']['field']])) {
         $errors[] = t('An x or y field is defined, but not does not exist.');
       }
     }
