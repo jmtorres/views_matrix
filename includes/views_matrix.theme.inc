@@ -15,6 +15,8 @@
  */
 function template_preprocess_views_view_matrix(&$vars) {
 
+  drupal_add_css(drupal_get_path('module', 'views_matrix') . '/views_matrix.css');
+
   // @see template_preprocess_views_view_table
   $result = $vars['result'] = $vars['rows'];
   $vars['rows'] = array();
@@ -77,8 +79,17 @@ function template_preprocess_views_view_matrix(&$vars) {
 
   // Array padding and merging.
   $vars['header'] = array_merge(array(''), $columns);
-  $padded = array_pad(array(), count($columns)+1, '');
+  $padded = array_pad(array(), count($columns)+1, array('data' => '', 'attributes' => array('class' => array('views-matrix-cell', 'views-matrix-empty'))));
   $vars['rows'] = array_pad($vars['rows'], count($rows), $padded);
+
+  foreach (element_children($vars['rows']) as $y) {
+    foreach (element_children($vars['rows'][$y]) as $x) {
+      if ($x > 0) {
+        // Checkerboard striping on the actual cells only.
+        $vars['rows'][$y][$x]['attributes']['class'][] = (($x-1+$y) %2 == 0) ? 'even' : 'odd';
+      }
+    }
+  }
 
   foreach ($row_header as $n => $row_head) {
     $vars['rows'][$n][0] = $row_head;
@@ -133,18 +144,13 @@ function template_preprocess_views_view_matrix(&$vars) {
       $rendered_item .= $field_output;
     }
 
-    if (is_array($vars['rows'][$ykey][$xkey+1])) {
+    if ($vars['rows'][$ykey][$xkey+1]['data'] <> '') {
+      // Pack into existing cell.
       $vars['rows'][$ykey][$xkey+1]['data'] .= $rendered_item;
     }
     else {
-      $vars['rows'][$ykey][$xkey+1] = array(
-        'data' => $rendered_item,
-        'attributes' => array(
-          'class' => array(),
-        ),
-      );
-      
-      $vars['rows'][$ykey][$xkey+1]['attributes']['class'][] = ($xkey+1 % 2 == 0) ? 'even' : 'odd';
+      // Pack into new cell and add even/odd class.
+      $vars['rows'][$ykey][$xkey+1]['data'] = $rendered_item;
     }
   }
 }
