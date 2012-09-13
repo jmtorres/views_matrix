@@ -80,11 +80,6 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
   function validate() {
     $errors = parent::validate();
 
-    if (!$options->uses_fields) {
-      // Cannot support entity render.
-      $errors[] = t('Style @style requires a field row plugin.', array('@style' => $this->definition['title']));
-    }
-
     if (empty($this->options['xconfig']['field']) || empty($this->options['yconfig']['field'])) {
       // Do not save without x field or y field.
       $errors[] = t('Style @style requires an x and y field to be defined.', array('@style' => $this->definition['title']));
