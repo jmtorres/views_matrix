@@ -144,7 +144,7 @@ function template_preprocess_views_view_matrix(&$vars) {
       $rendered_item .= $field_output;
     }
 
-    if ($vars['rows'][$ykey][$xkey+1]['data'] <> '') {
+    if ($vars['rows'][$ykey][$xkey+1]['data'] != '') {
       // Pack into existing cell.
       $vars['rows'][$ykey][$xkey+1]['data'] .= $rendered_item;
     }
@@ -152,6 +152,9 @@ function template_preprocess_views_view_matrix(&$vars) {
       // Pack into new cell and add even/odd class.
       $vars['rows'][$ykey][$xkey+1]['data'] = $rendered_item;
     }
+
+    // Remove class views-matrix-empty
+    $vars['rows'][$ykey][$xkey+1]['attributes']['class'] = array_diff($vars['rows'][$ykey][$xkey+1]['attributes']['class'], array('views-matrix-empty'));
   }
 }
 
