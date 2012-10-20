@@ -26,9 +26,9 @@
     <?php foreach ($rows as $row_index => $row): ?>
     <tr class="<?php print implode(' ', $row_classes[$row_index]); ?>">
       <?php foreach ($row as $col_index => $content): ?>
-        <t<?php print ($col_index) ? 'd' : 'h'; ?><?php  print drupal_attributes($content['attributes']); ?>>
+        <t<?php print ($col_index === 'header') ? 'h' : 'd'; ?><?php  print drupal_attributes($content['attributes']); ?>>
           <?php print !empty($content) ? $content['data'] : ''; ?>
-        </t<?php print ($col_index) ? 'd' : 'h'; ?>>
+        </t<?php print ($col_index === 'header') ? 'h' : 'd'; ?>>
       <?php endforeach; ?>
     </tr>
     <?php endforeach; ?>
