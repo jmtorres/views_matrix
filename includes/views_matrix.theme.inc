@@ -27,6 +27,14 @@ function template_preprocess_views_view_matrix(&$vars) {
   $options = $view->style_plugin->options;
   $handler = $view->style_plugin;
   $fields = &$view->field;
+
+  $errors = $handler->canRender();
+  if (!empty($errors)) {
+    // Validation of row and column headers during runtime so it doesn't explode.
+    $message = theme('item_list', array('items' => $errors));
+    drupal_set_message(t('The view could not be rendered due to the following errors: !error', array('!error' => $message)), 'error');
+    return;
+  }
   
   $xfield = &$fields[$options['xconfig']['field']];
   $yfield = &$fields[$options['yconfig']['field']];

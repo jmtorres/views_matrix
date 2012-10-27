@@ -75,9 +75,12 @@ class views_matrix_plugin_style_matrix extends views_plugin_style {
   }
 
   /**
-   * Validate that the view can be saved.
+   * Validate row and colum header configuration set. This is only used during
+   * runtime. parent::validate() cannot be used because it breaks the Views
+   * UI.
    */
-  function validate() {
+  public function canRender() {
+
     $errors = parent::validate();
 
     if (empty($this->options['xconfig']['field']) || empty($this->options['yconfig']['field'])) {
