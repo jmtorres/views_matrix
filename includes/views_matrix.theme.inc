@@ -13,7 +13,7 @@
  *   rows: the rendered rows
  *   title: the title of the view
  */
-function template_preprocess_views_view_matrix(&$vars) {
+/*function template_preprocess_views_view_matrix(&$vars) {
 
   drupal_add_css(drupal_get_path('module', 'views_matrix') . '/views_matrix.css');
 
@@ -197,5 +197,127 @@ function template_preprocess_views_view_matrix(&$vars) {
     // Remove class views-matrix-empty
     $vars['rows'][$y_coordinate][$x_coordinate]['attributes']['class'] = array_diff($vars['rows'][$y_coordinate][$x_coordinate]['attributes']['class'], array('views-matrix-empty'));
   }
+}*/
+
+function template_preprocess_views_view_matrix(&$vars) {
+  drupal_add_css(drupal_get_path('module', 'views_matrix') . '/views_matrix.css');
+
+  // @see template_preprocess_views_view_table
+  $result = $vars['result'] = $vars['rows'];
+  $vars['rows'] = array();
+  $vars['header'] = array('');
+  $vars['row_classes'] = array();
+
+  $view = &$vars['view'];
+  $options = $view->style_plugin->options;
+  $handler = $view->style_plugin;
+  $fields = &$view->field;
+
+  $errors = $handler->canRender();
+  if (!empty($errors)) {
+    // Validation of row and column headers during runtime so it doesn't explode.
+    $message = theme('item_list', array('items' => $errors));
+    drupal_set_message(t('The view could not be rendered due to the following errors: !error', array('!error' => $message)), 'error');
+    return;
+  }
+
+
+  $column_field = array('field' => 'field_size', 'sort' => 'asc');
+
+  $row_fields = array(
+    array('field' => 'title', 'sort' => 'asc'),
+    array('field' => 'field_color_term', 'sort' => 'asc')
+  );
+
+  $data_fields = array();
+  foreach($row_fields as $row_field){
+    $data_fields[] = $row_field['field'];
+  }
+  $data_fields[] = $column_field['field'];
+
+  /*$data = array(
+    'product_1' => array(
+      'header' => 'Product 1 Name',
+      'data' => array(
+        'color_1' => array(
+          'header' => 'Color 1 Name',
+          'data' => array(
+            'size_1' => array(
+              'data' => CELL_DATA,
+            )
+            'size_2' => array(
+              'data' => CELL_DATA,
+            )
+          ),
+        ),
+      ),
+    ),
+  );*/
+
+  $renders = $handler->render_fields($result);
+  $data = array();
+  $column_headers = array();
+//dpm(get_defined_vars());return;
+
+  foreach ($result as $row_index => $row){
+    $cell = &$data;
+    foreach($data_fields as $field){
+      $field_value = $field_index = $fields[$field]->get_value($row);
+      if(!is_scalar($field_index)){
+        $field_index = md5(serialize($field_index));
+      }
+      if(empty($cell[$field_index])){
+        $cell[$field_index] = array();
+        $cell[$field_index]['header'] = $field_value;
+        $cell[$field_index]['data'] = NULL;
+      }
+      $cell = &$cell[$field_index]['data'];
+    }
+    if(empty($column_headers[$field_index])){
+      $column_headers[$field_index] = $field_value;
+    }
+    $cell = "CELL_DATA";
+  }
+
+  /*$column_headers = array(
+    'size_1' => 'S',
+    'size_2' => 'M',
+    'size_3' => 'L',
+  );*/
+//dpm(get_defined_vars());return;
+  $rows = _views_matrix_rows($data, $data_fields, $column_headers);
+  dpm(get_defined_vars());
 }
 
+function _views_matrix_rows(&$data, $data_fields, $column_headers, $level = 1){
+  $cells = array();
+  if(count($data_fields) < $level){
+    foreach($column_headers as $column_index => $column){
+      $cell = array(
+        'data' => $data['data'][$column_index],
+        'attributes' => array('class' => array('views-matrix-cell')),
+      );
+dpm($level);dpm($column_headers);dpm($data);dpm($column);
+      if(empty($data['data'][$column_index])){
+        $cell['attributes']['class'][] = 'views-matrix-empty';
+      }
+      $cells[] = $cell;
+    }
+    return array($cells);
+  }
+  $rows = array();
+dpm($level);
+  foreach($data as $index => $value){
+    $sub_rows = _views_matrix_rows($value, $data_fields, $column_headers, $level + 1);
+    $row_count = count($value['data']);
+    $row_header = array(
+      'data' => $value['header'],
+      'attributes' => array(
+        'class' => array('views-matrix-row-header'),
+      ),
+    );
+    array_unshift($sub_rows[0], $row_header);
+    $rows = array_merge($rows, $sub_rows);
+  }
+  return $rows;
+}
